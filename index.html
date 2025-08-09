@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Maze - Particle Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --particle-1: #ff2a6d;
+            --particle-2: #05d9e8;
+            --particle-3: #d1f7ff;
+            --particle-4: #f7d600;
+        }
+        
+        body {
+            background: radial-gradient(circle at center, #0f0f1a 0%, #000000 100%);
+        }
+        
+        .maze-container {
+            background: rgba(15, 15, 26, 0.7);
+            box-shadow: 0 0 30px rgba(5, 217, 232, 0.3);
+        }
+        
+        .joystick-base {
+            background: rgba(5, 217, 232, 0.1);
+            box-shadow: 0 0 20px rgba(5, 217, 232, 0.5);
+        }
+        
+        .particle-1 { background-color: var(--particle-1); box-shadow: 0 0 15px var(--particle-1); }
+        .particle-2 { background-color: var(--particle-2); box-shadow: 0 0 15px var(--particle-2); }
+        .particle-3 { background-color: var(--particle-3); box-shadow: 0 0 15px var(--particle-3); }
+        .particle-4 { background-color: var(--particle-4); box-shadow: 0 0 15px var(--particle-4); }
+        
+        .wall {
+            background: rgba(5, 217, 232, 0.8);
+            box-shadow: 0 0 5px rgba(5, 217, 232, 0.8);
+        }
+        
+        .black-hole {
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+        }
+        
+        .target-zone {
+            animation: pulse-target 2s infinite alternate;
+        }
+        
+        @keyframes pulse-target {
+            0% { box-shadow: 0 0 10px rgba(255, 42, 109, 0.5); }
+            100% { box-shadow: 0 0 30px rgba(255, 42, 109, 0.8); }
+        }
+        
+        .status-panel {
+            background: linear-gradient(135deg, rgba(5, 217, 232, 0.1) 0%, rgba(255, 42, 109, 0.1) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        .joystick-handle {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body class="font-['Oxanium'] text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Game Panel -->
+        <div class="lg:col-span-2 flex flex-col items-center">
+            <h1 class="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500">
+                NEON MAZE
+            </h1>
+            <p class="text-cyan-300 mb-6">Guide all particles to the target zone</p>
+            
+            <div class="maze-container relative rounded-xl border border-cyan-500/30 overflow-hidden">
+                <div id="maze" class="relative w-[350px] h-[315px] flex items-center justify-center">
+                    <div id="end" class="target-zone absolute w-[65px] h-[65px] rounded-full border-2 border-dashed border-pink-500"></div>
+                </div>
+                
+                <!-- Status Message -->
+                <div id="note" class="absolute bottom-0 left-0 right-0 bg-black/70 p-3 text-center text-sm transition-opacity duration-500">
+                    Click the joystick to start!
+                    <p class="text-cyan-300 mt-1">Move all particles to the center. Press H for hard mode</p>
+                </div>
+            </div>
+            
+            <!-- Joystick -->
+            <div class="mt-8 flex flex-col items-center">
+                <div class="relative">
+                    <div id="joystick" class="joystick-base relative w-20 h-20 rounded-full border border-cyan-500/50 flex items-center justify-center">
+                        <div class="joystick-handle absolute w-8 h-8 rounded-full" id="joystick-head"></div>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mt-2">Tilt to move particles</p>
+            </div>
+        </div>
+        
+        <!-- Control Panel -->
+        <div class="status-panel rounded-xl border border-cyan-500/30 p-6 flex flex-col">
+            <h2 class="text-2xl font-bold mb-6 text-cyan-300">PARTICLE CONTROL</h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-black/30 p-3 rounded-lg border border-cyan-500/20">
+                    <p class="text-gray-400 text-sm">PARTICLES</p>
+                    <p class="text-2xl font-bold" id="particle-count">4</p>
+                </div>
+                <div class="bg-black/30 p-3 rounded-lg border border-cyan-500/20">
+                    <p class="text-gray-400 text-sm">MODE</p>
+                    <p class="text-2xl font-bold" id="game-mode">Normal</p>
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-3 text-cyan-300">PARTICLE STATUS</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <div class="particle-1 w-4 h-4 rounded-full mr-3"></div>
+                        <span>Alpha Particle</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="particle-2 w-4 h-4 rounded-full mr-3"></div>
+                        <span>Beta Particle</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="particle-3 w-4 h-4 rounded-full mr-3"></div>
+                        <span>Gamma Particle</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="particle-4 w-4 h-4 rounded-full mr-3"></div>
+                        <span>Delta Particle</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-auto">
+                <h3 class="text-lg font-semibold mb-3 text-cyan-300">CONTROLS</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="resetGame()" class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 py-2 px-3 rounded text-sm transition">
+                        Reset (Space)
+                    </button>
+                    <button onclick="toggleHardMode()" class="bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 py-2 px-3 rounded text-sm transition">
+                        Toggle Mode (H)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
